@@ -1,4 +1,4 @@
-package com.android.news
+package com.android.news.base
 
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -8,15 +8,13 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.android.news.utils.ThemeManager
 
 open class BaseActivity : AppCompatActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
     }
 
     fun updateMode() {
         val savedMode = ThemeManager.getSavedTheme(this)
-        var changedMode = 0
-        changedMode = if (savedMode == AppCompatDelegate.MODE_NIGHT_NO) {
+        val changedMode = if (savedMode == AppCompatDelegate.MODE_NIGHT_NO) {
             AppCompatDelegate.MODE_NIGHT_YES
         } else {
             AppCompatDelegate.MODE_NIGHT_NO
@@ -29,16 +27,15 @@ open class BaseActivity : AppCompatActivity() {
     fun setUpTheme() {
         val savedMode = ThemeManager.getSavedTheme(this)
         AppCompatDelegate.setDefaultNightMode(savedMode)
-
     }
 
     private fun saveTheme(mode: Int) {
         ThemeManager.saveTheme(mode, this)
     }
 
-    fun showToast(msg:String){
+    fun showToast(msg: String, duration: Int = Toast.LENGTH_SHORT) {
         runOnUiThread {
-            Toast.makeText(this,msg,Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, msg, duration).show()
         }
     }
 }

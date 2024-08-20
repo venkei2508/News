@@ -14,9 +14,6 @@ interface NewsDao {
     @Query("SELECT * FROM news_articles")
     suspend fun getAllArticles(): List<NewsArticle>
 
-    @Query("SELECT * FROM news_articles WHERE title LIKE :searchQuery OR description LIKE :searchQuery")
-    suspend fun searchArticles(searchQuery: String): List<NewsArticle>
-
     @Query("DELETE FROM news_articles")
     suspend fun deleteAllArticles()
 

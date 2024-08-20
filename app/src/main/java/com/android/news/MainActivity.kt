@@ -8,14 +8,17 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.news.adapter.CommonAdapter
+import com.android.news.base.BaseActivity
 import com.android.news.database.Categories
 import com.android.news.database.NewsArticle
 import com.android.news.databinding.ActivityMainBinding
 import com.android.news.databinding.ItemArticlesBinding
 import com.android.news.databinding.ItemChipBinding
+import com.android.news.frgments.Filter
 import com.android.news.utils.Constants
 import com.android.news.utils.Utilities
 import com.android.news.utils.capitalText
@@ -23,16 +26,21 @@ import com.android.news.utils.gone
 import com.android.news.utils.show
 import com.android.news.utils.text
 import com.android.news.viewmodel.NewsViewModel
+import com.android.news.views.ArticleView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity(), Filter.Selected {
-    private val TAG = "MainActivity"
     private lateinit var binding: ActivityMainBinding
     private val newsViewModel: NewsViewModel by viewModels()
     private val filterList = ArrayList<Categories>()
     private var offset = 1
     private lateinit var layoutManager: LinearLayoutManager
+    private var searchJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,10 +48,11 @@ class MainActivity : BaseActivity(), Filter.Selected {
         setUpTheme()
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
-        handleSearch()
         initUI()
         observeViewModel()
+        handleSearch()
     }
+
     private fun initUI() {
         layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         binding.rvList.apply {
@@ -53,17 +62,36 @@ class MainActivity : BaseActivity(), Filter.Selected {
 
         binding.rvFilter.adapter = filterAdapter
         showLoading()
-        newsViewModel.fetchNews("en", null, offset, Constants.API_KEY)
-        newsViewModel.fetchCategories(Constants.API_KEY)
+        fetchInitialData()
+    }
+
+    private fun fetchInitialData() {
+        if (Utilities.isNetworkAvailable(this)) {
+            newsViewModel.fetchNews("en", null, offset, Constants.API_KEY)
+            newsViewModel.fetchCategories(Constants.API_KEY)
+        } else {
+            showToast(Constants.NO_INTERNET)
+            showError()
+        }
     }
 
     private fun observeViewModel() {
         newsViewModel.articles.observe(this) { articles ->
+            hideLoading()
             if (articles.isNullOrEmpty()) {
                 showError()
             } else {
-                Log.d(TAG, "Articles size: ${articles.size}")
-                hideLoading()
+                Timber.d("Articles size: ${articles.size}")
+                newsAdapter.setData(articles as ArrayList<NewsArticle>)
+            }
+        }
+
+        newsViewModel.search.observe(this) { articles ->
+            hideLoader()
+            if (articles.isNullOrEmpty()) {
+                showToast("No Results Found...!")
+            } else {
+                Timber.d("Search Articles size: ${articles.size}")
                 newsAdapter.setData(articles as ArrayList<NewsArticle>)
             }
         }
@@ -77,49 +105,52 @@ class MainActivity : BaseActivity(), Filter.Selected {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                //newText?.let { searchNews(it) }
+                searchJob?.cancel() // Cancel the previous job if it's still running
+                searchJob = lifecycleScope.launch {
+                    delay(300) // Debounce time in milliseconds
+                    newText?.let {
+                        if (it.isEmpty()) {
+                            fetchInitialData()
+                        } else {
+                            searchNews(it)
+                        }
+                    }
+                }
                 return true
             }
         })
     }
 
     private fun searchNews(query: String) {
-        showToast(query)
-        // Assume newsViewModel is already initialized and has a method for search
-       /* newsViewModel.searchNews(query).observe(this) { articles ->
-            if (articles.isNullOrEmpty()) {
-                // Handle no results case
-            } else {
-                newsAdapter.setData(articles)
-            }
-        }*/
-    }
-
-
-
-    private fun showLoading() {
-        binding.apply {
-            pbLoading.show()
-            tvError.gone()
-            rvList.gone()
+        if (Utilities.isNetworkAvailable(this)) {
+            showLoader()
+            newsViewModel.fetchSearch("en", query, Constants.API_KEY)
+        } else {
+            showToast(Constants.NO_INTERNET)
         }
     }
 
-    private fun hideLoading() {
-        binding.apply {
-            pbLoading.gone()
-            tvError.gone()
-            rvList.show()
-        }
+    private fun showLoading() = with(binding) {
+        pbLoading.show()
+        tvError.gone()
+        rvList.gone()
     }
 
-    private fun showError() {
+    private fun hideLoading() = with(binding) {
+        pbLoading.gone()
+        tvError.gone()
+        rvList.show()
+    }
+
+    private fun showLoader() = binding.pbLoading.show()
+
+    private fun hideLoader() = binding.pbLoading.gone()
+
+    private fun showError() = with(binding) {
         if (offset == 1) {
-            binding.apply {
-                pbLoading.gone()
-                tvError.show()
-                rvList.gone()
-            }
+            pbLoading.gone()
+            tvError.show()
+            rvList.gone()
         }
     }
 
@@ -136,8 +167,6 @@ class MainActivity : BaseActivity(), Filter.Selected {
             startActivity(intent)
         }
     )
-
-
 
     override fun onSelected(list: ArrayList<Categories>) {
         if (Utilities.isNetworkAvailable(this)) {
@@ -190,27 +219,22 @@ class MainActivity : BaseActivity(), Filter.Selected {
                 true
             }
             R.id.action_filter -> {
-                val filterDialog = Filter().apply {
+                Filter().apply {
                     show(supportFragmentManager, "Filter")
                     setSelected(this@MainActivity)
                 }
                 true
             }
-
-            R.id.action_theme-> {
+            R.id.action_theme -> {
                 updateMode()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
-
     }
 
     private fun toggleSearchBarVisibility() {
-        if (binding.searchView.visibility == View.GONE) {
-            binding.searchView.visibility = View.VISIBLE
-        } else {
-            binding.searchView.visibility = View.GONE
-        }
+        binding.searchView.visibility =
+            if (binding.searchView.visibility == View.GONE) View.VISIBLE else View.GONE
     }
 }

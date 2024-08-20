@@ -23,9 +23,19 @@ private val repository: NewsRepo
     private val _categories = MutableLiveData<List<Categories>>()
     val categories: LiveData<List<Categories>> = _categories
 
+
+    private val _search = MutableLiveData<List<NewsArticle>>()
+    val search: LiveData<List<NewsArticle>> = _search
+
     fun fetchNews(language: String, category: String?, pageNumber: Int, apiKey: String) {
         viewModelScope.launch {
             _articles.value = repository.getTopHeadlines(language, category, pageNumber, apiKey)
+        }
+    }
+
+    fun fetchSearch(language: String, query: String?,  apiKey: String) {
+        viewModelScope.launch {
+            _search.value = repository.fetchSearch(language, query, apiKey)
         }
     }
 

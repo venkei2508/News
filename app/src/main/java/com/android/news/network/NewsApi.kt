@@ -23,10 +23,8 @@ interface NewsApi {
     @GET("search")
     suspend fun getSearch(
         @Query("language") language: String,
-        @Query("category") category: String?,
+        @Query("keywords") category: String?,
         @Query("page_number") page_number: Int?,
         @Query("apiKey") apiKey: String
     ): NewsResponse
-
-
 }

@@ -9,8 +9,6 @@ object ThemeManager {
     private const val PREFS_NAME = "theme_prefs"
     private const val KEY_THEME = "theme"
 
-
-
     fun saveTheme(mode: Int, context: Context) {
         val sharedPref =context. getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         with(sharedPref.edit()) {

@@ -12,7 +12,7 @@ import javax.inject.Singleton
 class NewsRepo @Inject constructor(
     private val newsApi: NewsApi,
     private val newsDao: NewsDao,
-    private val context: Context // Injecting the context here
+    private val context: Context
 
 ) {
     suspend fun getTopHeadlines(
@@ -29,6 +29,15 @@ class NewsRepo @Inject constructor(
             newsDao.insertArticles(response.news)
         }
         return newsDao.getAllArticles()
+    }
+
+    suspend fun fetchSearch(
+        language: String,
+        query: String?,
+        apiKey: String
+    ): List<NewsArticle> {
+        val response = newsApi.getSearch(language, query, 30, apiKey)
+        return response.news
     }
 
     suspend fun getCategories(

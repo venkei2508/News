@@ -29,5 +29,6 @@
 
     <color name="colorSubTitle">#808080</color>
     <color name="colorGray">#ddd</color>
+    <color name="colorTime">#747474</color>
     <color name="color_f3">#f3f3f3</color>
 </resources>

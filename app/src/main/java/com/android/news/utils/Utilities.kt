@@ -1,5 +1,6 @@
 package com.android.news.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -35,7 +36,8 @@ object Utilities {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
+    @SuppressLint("NewApi")
     fun convertTime(timeStr: String): String {
         // Define the input format
         val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z")

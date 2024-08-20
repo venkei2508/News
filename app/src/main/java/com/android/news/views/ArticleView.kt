@@ -1,6 +1,7 @@
-package com.android.news
+package com.android.news.views
 
 import android.os.Bundle
+import com.android.news.base.BaseActivity
 import com.android.news.database.NewsArticle
 import com.android.news.databinding.ActivityArticleViewBinding
 import com.android.news.utils.Utilities
@@ -30,6 +31,7 @@ class ArticleView : BaseActivity() {
         mBinding.tvTitle.capitalText(mData!!.title)
         mBinding.tvSubTitle.capitalText(mData!!.description!!)
         mBinding.tvTime.capitalText(Utilities.convertTime(mData!!.published))
+        mBinding.tvAuthor.capitalText("Author : ${mData!!.author!!.capitalText()}")
         mBinding.header.imgMode.setOnClickListener { updateMode() }
     }
 }
