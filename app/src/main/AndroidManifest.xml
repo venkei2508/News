@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".NewsApp"
@@ -16,6 +17,9 @@
         android:theme="@style/Theme.News"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".ArticleView"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

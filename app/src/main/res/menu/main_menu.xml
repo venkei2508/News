@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/baseline_search_24"
+        android:title="Search"
+        android:orderInCategory="100"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_filter"
+        android:icon="@drawable/baseline_filter_alt_24"
+        android:title="Filter"
+        android:orderInCategory="101"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_theme"
+        android:icon="@drawable/theme_normal_24"
+        android:title="Theme"
+        android:orderInCategory="101"
+        app:showAsAction="always"/>
+
+</menu>

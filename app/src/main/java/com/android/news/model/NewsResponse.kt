@@ -4,5 +4,10 @@ import com.android.news.database.NewsArticle
 
 class NewsResponse {
 
-    var articles:List<NewsArticle> = ArrayList()
+    var news:List<NewsArticle> = ArrayList()
 }
+
+data class CategoriesResponse(
+    var status:String,
+    var categories:ArrayList<String> = ArrayList()
+)

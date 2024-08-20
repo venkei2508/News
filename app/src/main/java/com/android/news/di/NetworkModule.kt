@@ -1,5 +1,6 @@
 package com.android.news.di
 
+import android.content.Context
 import android.util.Log
 import com.android.news.database.NewsDatabase
 import com.android.news.network.NewsApi
@@ -8,6 +9,7 @@ import com.android.news.viewmodel.NewsViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -21,7 +23,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofit(): Retrofit = Retrofit.Builder()
-        .baseUrl("https://newsapi.org/v2/")
+        .baseUrl("https://api.currentsapi.services/v1/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
@@ -34,9 +36,9 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideNewsRepository(apiService: NewsApi, database: NewsDatabase): NewsRepo {
+    fun provideNewsRepository(apiService: NewsApi, database: NewsDatabase,ctx:Context): NewsRepo {
         Log.e(TAG,"provideNewsRepository created ")
-        return NewsRepo(apiService,database.newsDao())
+        return NewsRepo(apiService,database.newsDao(),ctx)
     }
 
 
@@ -45,4 +47,11 @@ object NetworkModule {
     fun provideViewModel(res:NewsRepo) : NewsViewModel{
         return NewsViewModel(res)
     }
+
+    @Provides
+    @Singleton
+    fun provideContext(@ApplicationContext context: Context): Context {
+        return context
+    }
+
 }

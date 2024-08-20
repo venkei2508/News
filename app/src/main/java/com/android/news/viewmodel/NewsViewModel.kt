@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.news.database.Categories
 import com.android.news.database.NewsArticle
 import com.android.news.network.NewsRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,10 +19,26 @@ private val repository: NewsRepo
     private val _articles = MutableLiveData<List<NewsArticle>>()
     val articles: LiveData<List<NewsArticle>> = _articles
 
-    fun fetchNews(country: String, category: String?, query: String?, apiKey: String) {
+
+    private val _categories = MutableLiveData<List<Categories>>()
+    val categories: LiveData<List<Categories>> = _categories
+
+    fun fetchNews(language: String, category: String?, pageNumber: Int, apiKey: String) {
         viewModelScope.launch {
-            _articles.value = repository.getTopHeadlines(country, category, query, apiKey)
+            _articles.value = repository.getTopHeadlines(language, category, pageNumber, apiKey)
         }
     }
 
+    fun fetchCategories( apiKey: String) {
+        viewModelScope.launch {
+            _categories.value = repository.getCategories(apiKey)
+        }
+    }
+
+
+    fun fetchCategories() {
+        viewModelScope.launch {
+            _categories.value = repository.getCategories()
+        }
+    }
 }

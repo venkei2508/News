@@ -8,10 +8,26 @@ import androidx.room.Query
 @Dao
 interface NewsDao {
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertArticles(articles: List<NewsArticle>)
+
+    @Query("SELECT * FROM news_articles")
+    suspend fun getAllArticles(): List<NewsArticle>
+
+    @Query("SELECT * FROM news_articles WHERE title LIKE :searchQuery OR description LIKE :searchQuery")
+    suspend fun searchArticles(searchQuery: String): List<NewsArticle>
+
+    @Query("DELETE FROM news_articles")
+    suspend fun deleteAllArticles()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertNews(articles: List<NewsArticle>)
+    suspend fun insertCategories(articles: List<Categories>)
 
-    @Query("SELECT * FROM news_articles WHERE title LIKE :query")
-    suspend fun searchNews(query: String): List<NewsArticle>
+
+    @Query("DELETE FROM categories")
+    suspend fun deleteAllCategories()
+
+    @Query("SELECT * FROM categories")
+    suspend fun getAllCategories(): List<Categories>
+
 }

@@ -10,15 +10,15 @@
 
 
     <!-- Light theme colors -->
-    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimary">#000</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorPrimaryVariant">#3700B3</color>
     <color name="colorSecondary">#03DAC6</color>
     <color name="colorSecondaryDark">#018786</color>
-    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorBackground">#000</color>
     <color name="colorSurface">#FFFFFF</color>
     <color name="colorError">#B00020</color>
-    <color name="textColorPrimary">#000000</color>
+    <color name="textColorPrimary">#fff</color>
 
     <!-- Dark theme colors -->
     <color name="colorBackgroundDark">#121212</color>
@@ -29,5 +29,4 @@
 
     <color name="colorSubTitle">#808080</color>
     <color name="colorGray">#ddd</color>
-    <color name="color_f3">#f3f3f3</color>
 </resources>
